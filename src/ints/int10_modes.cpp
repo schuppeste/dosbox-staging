@@ -536,6 +536,9 @@ bool INT10_SetVideoMode_OTHER(Bit16u mode,bool clearmem) {
 		CurMode=&Hercules_Mode;
 		mode=7; // in case the video parameter table is modified
 		break;
+	case MCH_EGA:
+	case MCH_VGA:
+		break;
 	}
 	LOG(LOG_INT10,LOG_NORMAL)("Set Video Mode %X",mode);
 
@@ -680,6 +683,9 @@ bool INT10_SetVideoMode_OTHER(Bit16u mode,bool clearmem) {
 		real_writeb(BIOSMEM_SEG,BIOSMEM_CURRENT_PAL,color_select);
 		INT10_SetColorSelect(1);
 		INT10_SetBackgroundBorder(0);
+		break;
+	case MCH_EGA:
+	case MCH_VGA:
 		break;
 	}
 
