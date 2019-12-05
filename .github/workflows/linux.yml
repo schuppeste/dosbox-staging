@@ -50,7 +50,7 @@ jobs:
           architecture: armv7
           distribution: buster
           run: |
-            sudo apt-get install -y $(./scripts/list-build-dependencies.sh -m apt -c gcc)
+            sudo apt-get install -y build-essential $(./scripts/list-build-dependencies.sh -m apt -c gcc)
             ./scripts/log-env.sh
             ./scripts/build.sh --build-type Debug -c gcc
             MAX_WARNINGS=-1 ./scripts/count-warnings.py build.log
