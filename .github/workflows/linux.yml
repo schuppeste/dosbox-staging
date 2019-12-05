@@ -9,19 +9,19 @@ jobs:
     strategy:
       matrix:
         conf:
-          - name: GCC-5 (Ubuntu 16.04)
+          - name: GCC-5 x86_64 (Ubuntu 16.04)
             os: ubuntu-16.04
             flags: -c gcc
             max_warnings: 284
-          - name: GCC-7 (Ubuntu 18.04)
+          - name: GCC-7 x86_64 (Ubuntu 18.04)
             os: ubuntu-18.04
             flags: -c gcc
             max_warnings: 287
-          - name: GCC-9 (Ubuntu 18.04)
+          - name: GCC-9 x86_64 (Ubuntu 18.04)
             os: ubuntu-18.04
             flags: -c gcc -v 9
             max_warnings: 310
-          - name: Clang-8 (Ubuntu 18.04)
+          - name: Clang-8 x86_64 (Ubuntu 18.04)
             os: ubuntu-18.04
             flags: -c clang -v 8
             max_warnings: 157
@@ -41,7 +41,7 @@ jobs:
 
   build_debian_armv7:
     runs-on: ubuntu-18.04
-    name: Build on ARMv7
+    name: GCC ARMv7 (Buster)
     steps:
       - uses: actions/checkout@v1.0.0
       - uses: uraimo/run-on-arch-action@v1.0.5
@@ -50,11 +50,10 @@ jobs:
           architecture: armv7
           distribution: buster
           run: |
+            sudo apt-get install -y $(./scripts/list-build-dependencies.sh -m apt -c gcc)
             ./scripts/log-env.sh
-            echo ::set-output name=uname::$(uname -a)
-      - name: Get the output
-        run: |
-            echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
+            ./scripts/build.sh --build-type Debug -c gcc
+            MAX_WARNINGS=-1 ./scripts/count-warnings.py build.log
 
   build_linux_release_dynamic:
     name: Release build (dynamic)
