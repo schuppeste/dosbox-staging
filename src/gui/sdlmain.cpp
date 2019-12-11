@@ -49,6 +49,7 @@
 #include "cpu.h"
 #include "cross.h"
 #include "control.h"
+#include "glidedef.h"
 
 #define MAPPERFILE "mapper-" VERSION ".map"
 //#define DISABLE_JOYSTICK
@@ -438,6 +439,10 @@ check_gotbpp:
 
 
 void GFX_ResetScreen(void) {
+	if(glide.enabled) {
+		GLIDE_ResetScreen(true);
+		return;
+	}
 	GFX_Stop();
 	if (sdl.draw.callback)
 		(sdl.draw.callback)( GFX_CallBackReset );
@@ -846,6 +851,9 @@ void GFX_SwitchFullScreen(void) {
 		sticky_keys(true); //restore sticky keys to default state in windowed mode.
 #endif
 	}
+	if (glide.enabled)
+		GLIDE_ResetScreen();
+	else
 	GFX_ResetScreen();
 }
 
@@ -1663,7 +1671,7 @@ void GFX_Events() {
 			throw(0);
 			break;
 		case SDL_VIDEOEXPOSE:
-			if (sdl.draw.callback) sdl.draw.callback( GFX_CallBackRedraw );
+			if ((sdl.draw.callback) && (!glide.enabled)) sdl.draw.callback( GFX_CallBackRedraw );
 			break;
 #ifdef WIN32
 		case SDL_KEYDOWN:
@@ -2105,6 +2113,8 @@ int main(int argc, char* argv[]) {
 			if (strcmp(sdl_drv_name,"windib")==0) LOG_MSG("SDL_Init: Starting up with SDL windib video driver.\n          Try to update your video card and directx drivers!");
 		}
 #endif
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	glide.fullscreen = &sdl.desktop.fullscreen;
 	sdl.num_joysticks=SDL_NumJoysticks();
 
 	/* Parse configuration files */
@@ -2228,4 +2238,8 @@ void GFX_GetSize(int &width, int &height, bool &fullscreen) {
 	width = sdl.draw.width;
 	height = sdl.draw.height;
 	fullscreen = sdl.desktop.fullscreen;
+}
+
+bool OpenGL_using(void) {
+	return (sdl.desktop.want_type==SCREEN_OPENGL?true:false);
 }
