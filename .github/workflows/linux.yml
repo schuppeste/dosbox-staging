@@ -42,7 +42,7 @@ jobs:
           MAX_WARNINGS: ${{ matrix.conf.max_warnings }}
         run:  ./scripts/count-warnings.py build.log
       - name: Run tests
-        if:   matrix.conf.run_tests == 'true'
+        if:   matrix.conf.run_tests
         run:  |
           for t in contrib/tests/t*.sh ; do
             echo "Running $t"
