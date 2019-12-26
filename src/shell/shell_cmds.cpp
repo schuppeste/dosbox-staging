@@ -17,21 +17,23 @@
  */
 
 
-#include "dosbox.h"
 #include "shell.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <string>
+#include <vector>
+
 #include "callback.h"
 #include "regs.h"
 #include "bios.h"
 #include "../dos/drives.h"
 #include "support.h"
 #include "control.h"
-#include <algorithm>
-#include <cstring>
-#include <cctype>
-#include <cstdlib>
-#include <vector>
-#include <string>
-#include <time.h>
 
 static SHELL_Cmd cmd_list[]={
 {	"DIR",		0,			&DOS_Shell::CMD_DIR,		"SHELL_CMD_DIR_HELP"},
@@ -1329,10 +1331,16 @@ void DOS_Shell::CMD_CHOICE(char * args){
 			WriteOut(MSG_Get("SHELL_ILLEGAL_SWITCH"),rem);
 			return;
 		}
-		if (args == rem) args = strchr(rem,0)+1;
-		if (rem) rem += 2;
-		if(rem && rem[0]==':') rem++; /* optional : after /c */
-		if (args > last) args = NULL;
+		if (args == rem) {
+			assert(rem);
+			args = strchr(rem, '\0') + 1;
+		}
+		if (rem)
+			rem += 2;
+		if (rem && rem[0] == ':')
+			rem++; /* optional : after /c */
+		if (args > last)
+			args = NULL;
 	}
 	if (!rem || !*rem) rem = defchoice; /* No choices specified use YN */
 	ptr = rem;
@@ -1349,13 +1357,14 @@ void DOS_Shell::CMD_CHOICE(char * args){
 	}
 	/* Show question prompt of the form [a,b]? where a b are the choice values */
 	if (!optN) {
-		if(args && *args) WriteOut(" ");
-		WriteOut("[");
-		size_t len = strlen(rem);
-		for(size_t t = 1; t < len; t++) {
-			WriteOut("%c,",rem[t-1]);
+		if (args && *args)
+			WriteOut(" ");
+		const size_t len = strlen(rem);
+		WriteOut("[%c", rem[0]);
+		for (size_t t = 1; t < len; t++) {
+			WriteOut(",%c", rem[t]);
 		}
-		WriteOut("%c]?",rem[len-1]);
+		WriteOut("]?");
 	}
 
 	Bit16u n=1;
@@ -1364,6 +1373,7 @@ void DOS_Shell::CMD_CHOICE(char * args){
 	} while (!c || !(ptr = strchr(rem,(optS?c:toupper(c)))));
 	c = optS?c:(Bit8u)toupper(c);
 	DOS_WriteFile (STDOUT,&c, &n);
+	WriteOut("\n");
 	dos.return_code = (Bit8u)(ptr-rem+1);
 }
 
