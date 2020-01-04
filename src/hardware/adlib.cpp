@@ -819,11 +819,6 @@ Module::Module(Section *configuration)
 	  handler(nullptr),
 	  capture(nullptr)
 {
-	// ctrl.active = false;
-	// ctrl.index = 0;
-	// ctrl.lvol = 0xff;
-	// ctrl.rvol = 0xff;
-
 	Section_prop * section=static_cast<Section_prop *>(configuration);
 	Bitu base = section->Get_hex("sbbase");
 	Bitu rate = section->Get_int("oplrate");
