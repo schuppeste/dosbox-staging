@@ -375,7 +375,7 @@
     <ClInclude Include="..\src\libs\decoders\stb_vorbis.h" />
     <ClInclude Include="..\src\libs\decoders\xxh3.h" />
     <ClInclude Include="..\src\libs\decoders\xxhash.h" />
-    <ClCompile Include="..\src\libs\nuked\nukedopl.h" />
+    <ClInclude Include="..\src\libs\nuked\nukedopl.h" />
     <ClInclude Include="..\src\platform\visualc\config.h" />
     <ClInclude Include="..\src\platform\visualc\unistd.h" />
   </ItemGroup>
