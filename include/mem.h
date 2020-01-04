@@ -82,20 +82,6 @@ static INLINE void host_writed(HostPt off,Bit32u val) {
 	off[3]=(Bit8u)(val >> 24);
 }
 
-static INLINE uint16_t var_read_f(uint16_t val) { // TODO: from_low_endian or something
-	const uint8_t off_0 = (uint8_t)(val);
-	const uint8_t off_1 = (uint8_t)(val >> 8);
-	return off_0 | off_1;
-}
-
-static INLINE uint32_t var_read_f(uint32_t val) {
-	const uint8_t off_0 = (uint8_t)(val);
-	const uint8_t off_1 = (uint8_t)(val >> 8);
-	const uint8_t off_2 = (uint8_t)(val >> 16);
-	const uint8_t off_3 = (uint8_t)(val >> 24);
-	return off_0 | off_1 | off_2 | off_3;
-}
-
 #else
 
 static INLINE Bit8u host_readb(HostPt off) {
@@ -117,11 +103,34 @@ static INLINE void host_writed(HostPt off,Bit32u val) {
 	*(Bit32u *)(off)=val;
 }
 
-static INLINE uint16_t var_read_f(uint16_t val) {
+#endif
+
+// host_to_le functions allow for byte order conversion on big endian
+// architectures while respecting memory alignment on low endian.
+//
+// It is extremely unlikely that we'll ever try to compile on big endian arch
+// with a compiler missing __builtin_bswap*, so let's not overcomplicate
+// things.
+//
+// __builtin_bswap* is supported since GCC 4.3 and Clang 3.4
+
+#if defined(WORDS_BIGENDIAN)
+
+constexpr static INLINE uint16_t host_to_le(uint16_t val) {
+	return __builtin_bswap16(val);
+}
+
+constexpr static INLINE uint32_t host_to_le(uint32_t val) {
+	return __builtin_bswap32(val);
+}
+
+#else
+
+constexpr static INLINE uint16_t host_to_le(uint16_t val) {
 	return val;
 }
 
-static INLINE uint32_t var_read_f(uint32_t val) {
+constexpr static INLINE uint32_t host_to_le(uint32_t val) {
 	return val;
 }
 
