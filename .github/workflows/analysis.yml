@@ -13,12 +13,16 @@ jobs:
       - run:  sudo apt-get update
       - name: Install pylint
         run:  |
-          sudo apt-get install python3-setuptools
+          sudo apt-get install python3-setuptools ruby
           sudo pip3 install pylint beautifulsoup4 html5lib
+          sudo gem install mdl
+          sudo chmod go-w /usr/share/rust/.cargo/bin
       - name: Run pylint
         run:  ./scripts/verify-python.sh
       - name: Run shellcheck
         run:  ./scripts/verify-bash.sh
+      - name: Run markdownlint
+        run:  ./scripts/verify-markdown.sh
 
   build_clang_static_analyser:
     name: Clang static analyzer
